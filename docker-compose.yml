@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  app:
+    container_name: ${CONTAINER_NAME:-container}
+    image: ${IMAGE_NAME:-image}:${IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    mem_limit: ${MEM_LIMIT:-2g}
+    mem_reservation: ${MEM_RESERVATION:-1g}
+    cpus: ${CPUS:-1.0}
+    environment:
+      APP_NAME: ${APP_NAME:-app}
+      SERVER_PORT: 8080
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      MP_ACCESS_TOKEN: ${MP_ACCESS_TOKEN}
+      JAVA_TOOL_OPTIONS: >-
+        -XX:InitialRAMPercentage=${INITIAL_RAM_PERCENTAGE:-20}
+        -XX:MaxRAMPercentage=${MAX_RAM_PERCENTAGE:-80}
+        -XX:MaxMetaspaceSize=${MAX_METASPACE_SIZE:-512m}
+        -XX:+UseG1GC
+        -XX:+ClassUnloadingWithConcurrentMark
+        -XX:+HeapDumpOnOutOfMemoryError
+        -XX:+ExitOnOutOfMemoryError
+        -Dspring.main.lazy-initialization=true
+        -Dspring.threads.virtual.enabled=true
+        -Dserver.tomcat.max-threads=${TOMCAT_THREADS:-128}
+        -Dreactor.netty.ioWorkerCount=${NETTY_WORKERS:-4}
+    ports:
+      - "${APP_PORT}:8080"
+    restart: "no"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+      interval: ${HEALTH_INTERVAL:-15s}
+      timeout: ${HEALTH_TIMEOUT:-5s}
+      retries: ${HEALTH_RETRIES:-5}
+      start_period: ${HEALTH_START_PERIOD:-20s}

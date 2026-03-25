@@ -1,0 +1,53 @@
+server:
+  port: ${SERVER_PORT:8084}
+
+spring:
+  application:
+    name: ${APP_NAME:ms-order-service}
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://129.213.99.222:5435/order_db_dev}
+    username: ${DB_USERNAME:admin}
+    password: ${DB_PASSWORD:us0d01h91834m984j1zq4d}
+    hikari:
+      pool-name: AuthHikariPool
+      maximum-pool-size: 20
+      minimum-idle: 2
+
+      max-lifetime: 300000       # 5 minutos
+      idle-timeout: 120000       # 2 minutos
+      keepalive-time: 60000      # 1 minuto
+
+      connection-timeout: 30000
+      validation-timeout: 5000
+      connection-test-query: SELECT 1
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    show-sql: false
+  logging:
+    level:
+      org.springframework.security: DEBUG
+      org.springframework: DEBUG
+      com.bcpconsulting: DEBUG
+      com.zaxxer.hikari: DEBUG
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://129.213.99.222:8081/.well-known/jwks.json
+    uri: http://129.213.99.222:8081/
+  rabbitmq:
+    host: 129.213.99.222
+    port: 5672
+    username: admin
+    password: it28r9f8B9028fGmS
+
+app:
+  inventory:
+    base-url: http://129.213.99.222:8083/
+  usuario:
+    base-url: http://129.213.99.222:8081/
+
+mercadopago:
+  access-token: ${MP_ACCESS_TOKEN:TEST-6050389592070296-021216-bbf28075c0d2d854a24301551402b720-3198895858}
